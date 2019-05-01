@@ -419,7 +419,7 @@ void measure_global() {
     /* allocate arrays on CPU */
     uint32_t * h_timeinfo = nullptr;
     std::cout << std::setprecision(16) 
-        << "stride:Memory latency (clock cycles):function:clock rate (kHz)\n";
+        << "stride:memory latency (clock cycles):function:clock rate (kHz)\n";
     cudaMallocHost(&h_timeinfo, sizeof(uint32_t)*258);                  CUERR	
     parametric_measure_global(N, iterations, stride, h_timeinfo);
     parametric_measure_write_shared(N, iterations, stride, h_timeinfo+256);
