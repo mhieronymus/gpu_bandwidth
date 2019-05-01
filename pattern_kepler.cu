@@ -408,22 +408,27 @@ void measure_global() {
     cudaDeviceProp cuda_prop;
     cudaGetDeviceProperties(&cuda_prop, 0);                             CUERR
     clockRate = cuda_prop.clockRate;
-	int N, iterations; 
+	 
 	//stride in element
-    iterations = 1;
+    int iterations = 10;
+    int iterations_kernel = 1;
     // Stride of 32 MB where we use 4 byte words (uint32_t) as array
     uint64_t stride = 8;
     // Biggest access 
-    N = 1+(30+49*stride*4)*1024*256;
+    int N = 1+(30+49*stride*4)*1024*256;
     
     /* allocate arrays on CPU */
     uint32_t * h_timeinfo = nullptr;
     std::cout << std::setprecision(16) 
         << "stride:memory latency (clock cycles):function:clock rate (kHz)\n";
     cudaMallocHost(&h_timeinfo, sizeof(uint32_t)*258);                  CUERR	
-    parametric_measure_global(N, iterations, stride, h_timeinfo);
-    parametric_measure_write_shared(N, iterations, stride, h_timeinfo+256);
-    parametric_measure_clock(10000, &(h_timeinfo[257]));
+    for(uint32_t i=0; i<iterations; i++)
+        parametric_measure_global(N, iterations_kernel, stride, h_timeinfo);
+    for(uint32_t i=0; i<iterations; i++)
+        parametric_measure_write_shared(N, iterations_kernel, stride, h_timeinfo+256);
+    iterations_kernel = 10000;
+    for(uint32_t i=0; i<iterations; i++)
+        parametric_measure_clock(iterations_kernel, &(h_timeinfo[257]));
     cudaFreeHost(h_timeinfo);                                           CUERR    
 }
 
