@@ -4,7 +4,8 @@
 #include "cuda_runtime.h"
 #include <iostream>
 #include <iomanip>
-//compile nvcc *.cu -o test -O2
+//compile nvcc *.cu -o test -O2 -arch=sm_xx -std=c++11
+int clockRate;
 
 __global__ 
 void global_latency(
@@ -240,7 +241,7 @@ void parametric_measure_write_shared(
 
 	cudaThreadSynchronize ();
 
-    std::cout << "0:" << h_timeinfo[0] << ":shared write\n";
+    std::cout << "0:" << h_timeinfo[0] << ":shared write:" << clockRate << "\n";
 
 	/* free memory on GPU */
 	cudaFree(d_a);
@@ -369,7 +370,7 @@ void parametric_measure_global(
     for(i=0; i<256; i++)
     {
         std::cout << (h_index[i]-i)/(1024*256*sizeof(uint32_t)) << ":" 
-            << h_timeinfo[i] << ":global\n";
+            << h_timeinfo[i] << ":global:" << clockRate << "\n";
     }
 	/* free memory on GPU */
 	cudaFree(d_a);                                                      CUERR
@@ -397,12 +398,16 @@ void parametric_measure_clock(
     cudaMemcpy(h_timeinfo, duration, sizeof(uint32_t), D2H);            CUERR 
     cudaThreadSynchronize ();
     cudaFree(duration);                                                 CUERR
-    std::cout << "0:" << h_timeinfo[0] << ":clock()\n";
+    std::cout << "0:" << h_timeinfo[0] << ":clock():" << clockRate << "\n";
 }
 
 
 void measure_global() {
 
+    // Get clock rate in kHz
+    cudaDeviceProp cuda_prop;
+    cudaGetDeviceProperties(&cuda_prop, 0);                             CUERR
+    clockRate = cuda_prop.clockRate;
 	int N, iterations; 
 	//stride in element
     iterations = 1;
@@ -414,7 +419,7 @@ void measure_global() {
     /* allocate arrays on CPU */
     uint32_t * h_timeinfo = nullptr;
     std::cout << std::setprecision(16) 
-        << "stride:Memory latency (clock cycles):function\n";
+        << "stride:Memory latency (clock cycles):function:clock rate (kHz)\n";
     cudaMallocHost(&h_timeinfo, sizeof(uint32_t)*258);                  CUERR	
     parametric_measure_global(N, iterations, stride, h_timeinfo);
     parametric_measure_write_shared(N, iterations, stride, h_timeinfo+256);
