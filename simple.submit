@@ -1,0 +1,19 @@
+executable = /data/user/mhieronymus/gpu_bandwidth/bash_latency.sh
+request_memory = 2000MB
+request_disk = 2000MB
+universe = vanilla
+notification = Error
+stream_error = False
+stream_output = False
+getenv = True
+priority = 0
+request_cpus = 1
+request_gpus = 1
+requirements = CUDACapability
+
+when_to_transfer_output = ON_EXIT
+output = /data/user/mhieronymus/gpu_bandwidth/info.out
+error = /data/user/mhieronymus/gpu_bandwidth/info.err
+log = /scratch/mhieronymus/info.log
+initialdir = /data/user/mhieronymus/gpu_bandwidth/
+queue 1
