@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH -J latency 
+#SBATCH -o latency.\%j.out
+#SBATCH -p infogpu
+#SBATCH -n 1
+#SBATCH --gres=gpu:1
+#SBATCH -t 02:00:00
+#SBATCH -A pararch
+#SBATCH --nodelist=ps0001
+# You have to load the module and compile the code
+# module load system/CUDA/9.2.88
+# nvcc -O2 -std=sm_52 pattern_kepler.cu -o latency -std=c++11
+nvidia-smi
+srun ./latency  
